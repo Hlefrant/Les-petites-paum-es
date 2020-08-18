@@ -1,5 +1,11 @@
 <template>
-    <form method="post" @submit="this.addRestaurant">
+    <form method="post" @submit.prevent="addRestaurant">
+        <div class="field field-1">
+            <input type="file"
+                   name="photo"
+                   accept="image/png, image/jpeg"
+                   @change="processFile($event)">
+        </div>
         <div class="field field-1">
             <label for="">Nom</label>
             <input type="text" v-model="name">
@@ -36,7 +42,9 @@
 </template>
 
 <script>
-    import * as firebase from 'firebase/app';
+    import * as firebase from 'firebase';
+    import 'firebase/storage';
+    import {db} from "@/main";
 
     export default {
         name: "AddRestaurant",
@@ -44,14 +52,19 @@
             return {
                 name: null,
                 date: null,
+                image: '',
                 type: null,
                 address: null,
                 price: null,
+                value: null,
                 temp_value: null,
                 ratings: [1, 2, 3, 4, 5]
             }
         },
         methods: {
+            processFile(event) {
+                this.image = event.target.files[0]
+            },
             star_over: function (index) {
                 this.temp_value = this.value;
                 return this.value = index;
@@ -63,22 +76,36 @@
                 this.temp_value = value;
                 return this.value = value;
             },
-            addRestaurant: function () {
-                firebase.firestore().db.collection("restaurants").add({
-                    name: this.name,
-                    date: this.date,
-                    type: this.type,
-                    address: this.address,
-                    price: this.price,
-                    note: this.temp_value
-                })
-                    .then(function(docRef) {
-                        console.log("Document written with ID: ", docRef.id);
-                        this.$router.push('/')
+            addRestaurant: function (e) {
+                const storage = firebase.storage();
+                let self = this
+                storage.ref('restaurants/' + this.image.name).put(this.image)
+                    .then(response => {
+                        console.log(response)
+                        storage.ref().child('restaurants/' + this.image.name).getDownloadURL().then(function (url) {
+                            db.collection("restaurants").add({
+                                name: self.name,
+                                image: url,
+                                date: self.date,
+                                type: self.type,
+                                address: self.address,
+                                price: self.price,
+                                note: self.temp_value
+                            })
+                                .then(function (docRef) {
+                                    console.log("Document written with ID: ", docRef.id);
+                                    self.$router.push('/')
+                                })
+                                .catch(function (error) {
+                                    console.error("Error adding document: ", error);
+                                });
+                        }).catch(function (error) {
+                            console.log(error)
+                        });
                     })
-                    .catch(function(error) {
-                        console.error("Error adding document: ", error);
-                    });
+                    .catch(err => console.log(err))
+                e.preventDefault()
+
             }
         }
     }
@@ -89,8 +116,11 @@
         position: absolute;
         overflow: hidden;
         clip: rect(0 0 0 0);
-        height: 1px; width: 1px;
-        margin: -1px; padding: 0; border: 0;
+        height: 1px;
+        width: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
     }
 
     .star-rating {

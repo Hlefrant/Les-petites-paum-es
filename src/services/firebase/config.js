@@ -1,4 +1,5 @@
 import * as firebase from 'firebase';
+require("firebase/firestore");
 
 const configFirebase = () =>{
     const firebaseConfig = {
@@ -11,7 +12,7 @@ const configFirebase = () =>{
         appId: "1:186928631597:web:36ec362e150789f1b4cda4",
         measurementId: "G-W8C9YXSRDX"
     };
-
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     firebase.analytics();
 }

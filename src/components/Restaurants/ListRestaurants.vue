@@ -1,0 +1,58 @@
+<template>
+    <div class="list--restaurants">
+        <Restaurant v-for="restaurant in restaurants"
+                    :key="restaurant.id"
+                    :name="restaurant.name"
+                    :address="restaurant.address"
+                    :type="restaurant.type"
+                    :note="restaurant.note"
+                    :date="restaurant.date"
+                    :price="restaurant.price"
+                    :image="restaurant.image"/>
+    </div>
+</template>
+
+<script>
+    import { db } from "@/main";
+    import RestaurantModel from "@/components/Models/RestaurantModel";
+    import Restaurant from "@/components/Restaurants/Restaurant";
+    export default {
+        name: "ListRestaurants",
+        components:{
+            Restaurant
+        },
+        data: function () {
+            return{
+                restaurants: []
+            }
+        },
+        created() {
+            this.getRestaurants()
+        },
+        methods:{
+            getRestaurants: function () {
+                let self = this
+                db.collection("restaurants")
+                    .onSnapshot(function(restaurants) {
+                        restaurants.docs.forEach(restaurant =>{
+                            let name = restaurant.get('name')
+                            let type = restaurant.get('type')
+                            let note = restaurant.get('note')
+                            let price = restaurant.get('price')
+                            let image = restaurant.get('image')
+                            let date = restaurant.get('date')
+                            let address = restaurant.get('address')
+
+                            self.restaurants.push(new RestaurantModel(name,image,address,date,type,note,price))
+                        })
+                    });
+            }
+        }
+    }
+</script>
+
+<style scoped lang="scss">
+    .list--restaurants{
+        width: 50%;
+    }
+</style>
