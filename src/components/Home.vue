@@ -5,20 +5,28 @@
             Ajouter restaurants
         </router-link>
 
-        <ListRestaurants/>
+        <div class="container">
+            <ListRestaurants/>
+            <Map/>
+        </div>
     </div>
 </template>
 
 <script>
     import ListRestaurants from "@/components/Restaurants/ListRestaurants";
+    import Map from "@/components/Map/Map";
     export default {
         name: "Home",
         components:{
-            ListRestaurants
+            ListRestaurants,
+            Map
         }
     }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+    .container{
+        display: flex;
+    }
 
 </style>

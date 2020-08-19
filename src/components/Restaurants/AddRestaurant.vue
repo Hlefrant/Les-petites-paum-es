@@ -26,9 +26,8 @@
                 <option v-bind:value="2">€€€</option>
             </select>
         </div>
-        <div class="field field-2">
+        <div id="geocoder" class="field field-2">
             <label for="">Adresse</label>
-            <input type="text" v-model="address">
         </div>
         <div class="star-rating field field-2">
             <label class="star-rating__star" :key="rating" v-for="rating in ratings"
@@ -45,6 +44,8 @@
     import * as firebase from 'firebase';
     import 'firebase/storage';
     import {db} from "@/main";
+    const mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
+    import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
     export default {
         name: "AddRestaurant",
@@ -58,10 +59,32 @@
                 price: null,
                 value: null,
                 temp_value: null,
+                coord: null,
                 ratings: [1, 2, 3, 4, 5]
             }
         },
+        mounted() {
+            this.setGeocoderInput()
+        },
         methods: {
+            setGeocoderInput: function(){
+                mapboxgl.accessToken = 'pk.eyJ1Ijoib3NtaWlvcyIsImEiOiJja2UxajAzMGQ0NXFzMnh0djNmbm9iOHh5In0.JgkdHnVb3rMvM9wvhTlgDA';
+                const geocoder = new MapboxGeocoder({
+                    accessToken: mapboxgl.accessToken,
+                    countries: 'fr',
+                });
+
+                geocoder.addTo('#geocoder');
+                let self = this
+                geocoder.on('result', function(data) {
+                    self.coord = new firebase.firestore.GeoPoint(data.result.center[1],data.result.center[0])
+                    self.address = data.result.place_name
+                })
+                geocoder.on('clear', function() {
+                    self.coord = null
+                    self.address = null
+                })
+            },
             processFile(event) {
                 this.image = event.target.files[0]
             },
@@ -90,7 +113,8 @@
                                 type: self.type,
                                 address: self.address,
                                 price: self.price,
-                                note: self.temp_value
+                                note: self.temp_value,
+                                coord: self.coord
                             })
                                 .then(function (docRef) {
                                     console.log("Document written with ID: ", docRef.id);
