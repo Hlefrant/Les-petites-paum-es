@@ -4,7 +4,7 @@
 
 <script>
     import {db} from "@/main";
-    import 'mapbox-gl/dist/mapbox-gl.css';
+   import 'mapbox-gl/dist/mapbox-gl.css';
 
     export default {
         name: "Map",
@@ -26,15 +26,16 @@
                     container: 'map',
                     center: [4.834277, 45.763420],
                     zoom: 12,
-                    style: 'mapbox://styles/mapbox/streets-v11'
+                    style: 'mapbox://styles/osmiios/cke2p4kco0qd219m5emdieywg'
                 })
 
                 db.collection("restaurants")
                     .onSnapshot(function(restaurants) {
                         restaurants.docs.forEach(restaurant =>{
                             let coord = restaurant.get('coord')
-                            console.log(coord)
-                            new mapboxgl.Marker()
+                            var el = document.createElement('div');
+                            el.className = 'marker';
+                            new mapboxgl.Marker(el)
                                 .setLngLat([coord.longitude, coord.latitude])
                                 .addTo(map);
                         })
@@ -48,20 +49,16 @@
 </script>
 
 <style scoped lang="scss">
+
     #map {
         height: 80vh;
         width: 50%;
+
+
 
         .mapboxgl-ctrl-attrib {
             display: none;
         }
 
-        .mapboxgl-marker {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            border:1px solid gray;
-            background-image: url("../src/assets/food.svg");
-        }
     }
 </style>

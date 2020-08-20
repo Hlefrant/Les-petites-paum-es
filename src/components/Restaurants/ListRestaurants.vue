@@ -54,5 +54,6 @@
 <style scoped lang="scss">
     .list--restaurants{
         width: 50%;
+        margin: 0 8px;
     }
 </style>

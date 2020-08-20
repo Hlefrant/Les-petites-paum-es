@@ -22,7 +22,9 @@
             <label for="">Gamme de prix</label>
             <select type="text" v-model="price">
                 <option v-bind:value="0">€</option>
+                <option v-bind:value="0.5">€-€€</option>
                 <option v-bind:value="1">€€</option>
+                <option v-bind:value="1.5">€€-€€€</option>
                 <option v-bind:value="2">€€€</option>
             </select>
         </div>
