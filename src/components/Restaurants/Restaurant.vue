@@ -6,7 +6,7 @@
             <h2>{{ this.name }}</h2>
             <p>{{ this.address }}</p>
             <span>{{ this.date }}</span>
-            <p>{{ this.price }}</p>
+            <p>{{ displayPrice() }}</p>
             <p>{{ this.note }}</p>
         </div>
 
@@ -26,6 +26,22 @@
             price: Number,
             date: String,
             image: String
+        },
+        methods:{
+            displayPrice: function () {
+                switch (this.price) {
+                    case 0:
+                        return "€"
+                    case 0.5:
+                        return '€-€€'
+                    case 1 :
+                        return '€€'
+                    case 1.5 :
+                        return '€€-€€€'
+                    default:
+                        return '€€€'
+                }
+            }
         }
     }
 </script>
@@ -34,8 +50,7 @@
 
     .restaurant{
         margin-bottom: 20px;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        padding: 20px 10px;
         width: 100%;
         border-top:1px solid rgb(221, 221, 221) ;
         border-bottom:1px solid rgb(221, 221, 221) ;

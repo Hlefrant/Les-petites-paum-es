@@ -16,11 +16,29 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 
   @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
-
-
+  .marker{
+    background-color: white;
+    width: 25px;
+    height: 25px;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:before{
+      content: '';
+      background-image: url("~@/assets/food.svg");
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+  }
+body{
+  margin: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
