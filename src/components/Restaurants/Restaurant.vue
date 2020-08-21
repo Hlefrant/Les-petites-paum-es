@@ -7,7 +7,9 @@
             <p>{{ this.address }}</p>
             <span>{{ this.date }}</span>
             <p>{{ displayPrice() }}</p>
-            <p>{{ this.note }}</p>
+            <div class="stars">
+                <img class="star-rating__star" src="~@/assets/star.svg" v-for="star in note" :key="star.id"/>
+            </div>
         </div>
 
     </div>
@@ -47,7 +49,6 @@
 </script>
 
 <style scoped lang="scss">
-
     .restaurant{
         margin-bottom: 20px;
         padding: 20px 10px;
@@ -56,7 +57,7 @@
         border-bottom:1px solid rgb(221, 221, 221) ;
         display: flex;
         align-items: center;
-        img{
+        .image{
             width: 300px;
             height: 200px;
             border-radius: 16px;
@@ -72,6 +73,13 @@
             }
             p, h2{
                 margin: 0;
+            }
+
+            .stars{
+                img{
+                    width: 15px;
+                    margin-right: 3px;
+                }
             }
         }
     }

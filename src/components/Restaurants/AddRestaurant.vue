@@ -1,45 +1,48 @@
 <template>
-    <form method="post" @submit.prevent="addRestaurant">
-        <div class="field field-1">
-            <input type="file"
-                   name="photo"
-                   accept="image/png, image/jpeg"
-                   @change="processFile($event)">
-        </div>
-        <div class="field field-1">
-            <label for="">Nom</label>
-            <input type="text" v-model="name">
-        </div>
-        <div class="field field-1">
-            <label for="">Type de cuisine</label>
-            <input type="text" v-model="type">
-        </div>
-        <div class="field field-1">
-            <label for="">Date</label>
-            <input type="text" v-model="date">
-        </div>
-        <div class="field field-1">
-            <label for="">Gamme de prix</label>
-            <select type="text" v-model="price">
-                <option v-bind:value="0">€</option>
-                <option v-bind:value="0.5">€-€€</option>
-                <option v-bind:value="1">€€</option>
-                <option v-bind:value="1.5">€€-€€€</option>
-                <option v-bind:value="2">€€€</option>
-            </select>
-        </div>
-        <div id="geocoder" class="field field-2">
-            <label for="">Adresse</label>
-        </div>
-        <div class="star-rating field field-2">
-            <label class="star-rating__star" :key="rating" v-for="rating in ratings"
-                   :class="{'is-selected': ((value >= rating) && value != null), 'is-disabled': disabled}"
-                   v-on:click="set(rating)" v-on:mouseover="star_over(rating)" v-on:mouseout="star_out">
-                <input class="star-rating star-rating__checkbox" type="radio" :value="rating" :name="name"
-                       v-model="value" :disabled="disabled">★</label>
-        </div>
-        <input type="submit">
-    </form>
+    <div class="form__container">
+        <form method="post" @submit.prevent="addRestaurant">
+            <h1>Restaurant</h1>
+            <div class="field field-1">
+                <label for="">Image</label>
+                <input type="file"
+                       name="photo"
+                       accept="image/png, image/jpeg"
+                       @change="processFile($event)">
+            </div>
+            <div class="field field-1">
+                <label for="">Nom</label>
+                <input type="text" v-model="name">
+            </div>
+            <div class="field field-1">
+                <label for="">Type de cuisine</label>
+                <select type="text" v-model="type">
+                    <option value="" v-for="dataType in dataTypes" :key="dataType.id">{{dataType}}</option>
+                </select>
+            </div>
+            <div class="field field-1">
+                <label for="">Gamme de prix</label>
+                <select type="text" v-model="price">
+                    <option v-bind:value="0">€</option>
+                    <option v-bind:value="0.5">€-€€</option>
+                    <option v-bind:value="1">€€</option>
+                    <option v-bind:value="1.5">€€-€€€</option>
+                    <option v-bind:value="2">€€€</option>
+                </select>
+            </div>
+            <div id="geocoder" class="field field-1">
+                <label for="">Adresse</label>
+            </div>
+            <div class="star-rating field field-1">
+                <label for="">Note</label>
+                <label class="star-rating__star" :key="rating" v-for="rating in ratings"
+                       :class="{'is-selected': ((value >= rating) && value != null), 'is-disabled': disabled}"
+                       v-on:click="set(rating)" v-on:mouseover="star_over(rating)" v-on:mouseout="star_out">
+                    <input class="star-rating star-rating__checkbox" type="radio" :value="rating" :name="name"
+                           v-model="value" :disabled="disabled">★</label>
+            </div>
+            <input class="submit" type="submit" value="Ajouter">
+        </form>
+    </div>
 </template>
 
 <script>
@@ -53,8 +56,17 @@
         name: "AddRestaurant",
         data: function () {
             return {
+                dataTypes:['Asiatique','Italien',
+                    'Indien','Mexicain',
+                    'Américain','Street food',
+                    'Salade','Libanais',
+                    'Français','Turc',
+                    'Arabe', 'Oriental',
+                    'Pâtisserie','Jus et smoothies',
+                'Africain', 'Grec',
+                'Végétarien','Espagnol',
+                'Tex Mex', 'Canadien','Marocain'],
                 name: null,
-                date: null,
                 image: '',
                 type: null,
                 address: null,
@@ -111,7 +123,6 @@
                             db.collection("restaurants").add({
                                 name: self.name,
                                 image: url,
-                                date: self.date,
                                 type: self.type,
                                 address: self.address,
                                 price: self.price,
@@ -138,6 +149,70 @@
 </script>
 
 <style scoped lang="scss">
+    .form__container{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 100px);
+        form{
+            width: 800px;
+            background-color: white;
+            border-radius: 21px;
+            box-shadow: rgba(0, 0, 0, 0.28) 0 8px 28px;
+            padding: 15px 10px;
+            display: flex;
+            flex-wrap: wrap;
+            h1{
+                display: block;
+                width: 100%;
+                text-align: center;
+            }
+            .field{
+                margin-bottom: 15px !important;
+
+                input, select{
+                    width: 100%;
+                    padding: 0;
+                    height: 30px;
+                }
+                select{
+                    height: 34px;
+                }
+                label{
+                    display: block;
+                    margin-bottom: 5px;
+                }
+
+                &.field-1{
+                    margin: 0 2%;
+                    width: 45%;
+                }
+
+                &.field-2{
+                    width: 96%;
+                    margin: 0 2%;
+                }
+            }
+            .submit{
+                margin: 0 2%;
+                appearance: none;
+                background-color: transparent;
+                text-transform: uppercase;
+                border: 1px solid;
+                border-radius: 6px;
+                padding: 10px 15px;
+                outline: none;
+                transition: all 0.6s;
+                &:hover{
+                    cursor: pointer;
+                    background-color: #222222;
+                    color: white;
+                    transition: all 0.6s;
+                }
+            }
+        }
+    }
+
     %visually-hidden {
         position: absolute;
         overflow: hidden;
@@ -150,9 +225,8 @@
     }
 
     .star-rating {
-
         &__star {
-            display: inline-block;
+            display: inline-block !important;
             padding: 3px;
             vertical-align: middle;
             line-height: 1;

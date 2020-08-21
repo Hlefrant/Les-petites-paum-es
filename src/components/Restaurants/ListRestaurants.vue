@@ -6,7 +6,6 @@
                     :address="restaurant.address"
                     :type="restaurant.type"
                     :note="restaurant.note"
-                    :date="restaurant.date"
                     :price="restaurant.price"
                     :image="restaurant.image"/>
     </div>
@@ -40,10 +39,9 @@
                             let note = restaurant.get('note')
                             let price = restaurant.get('price')
                             let image = restaurant.get('image')
-                            let date = restaurant.get('date')
                             let address = restaurant.get('address')
 
-                            self.restaurants.push(new RestaurantModel(name,image,address,date,type,note,price))
+                            self.restaurants.push(new RestaurantModel(name,image,address,type,note,price))
                         })
                     });
             }
