@@ -19,19 +19,23 @@
 
 <script>
     import * as firebase from 'firebase/app';
+    import { checkAuthMixin } from "@/Mixins/firebase/checkAuthMixin";
 
     export default {
         name: "SignInForm",
+        mixins: [checkAuthMixin],
         data: function () {
             return{
                 email: null,
-                password: null
+                password: null,
             }
         },
+
         methods:{
             login(e){
+                let self = this
                 firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(function () {
-                    this.$router.push('/')
+                    self.$router.push('/')
                 }).catch(function(error) {
                     var errorCode = error.code;
                     var errorMessage = error.message;

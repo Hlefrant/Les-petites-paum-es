@@ -4,7 +4,14 @@
                 @submit.prevent="signUp"
                 method="post">
             <h1>Inscription</h1>
-            <div class="field field-2">
+            <div class="field field-1">
+                <label for="">Image</label>
+                <input type="file"
+                       name="photo"
+                       accept="image/png, image/jpeg"
+                       @change="processFile($event)">
+            </div>
+            <div class="field field-1">
                 <label for="">Username</label>
                 <input type="text" v-model="name"/>
             </div>
@@ -25,29 +32,61 @@
 </template>
 
 <script>
-    import * as firebase from 'firebase/app';
+    import * as firebase from 'firebase';
+    import 'firebase/storage';
+    import {db} from "@/main";
+    import {checkAuthMixin} from "@/Mixins/firebase/checkAuthMixin";
 
     export default {
         name: "SignUpForm",
+        mixins: [checkAuthMixin],
         data: function () {
             return {
                 name: null,
+                image: '',
                 email: null,
                 password: null
             }
         },
         methods: {
+            processFile(event) {
+                this.image = event.target.files[0]
+            },
             signUp: function (e) {
-                firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(function () {
-                    this.$router.push('/')
-                }).catch(function (error) {
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
+                const storage = firebase.storage();
+                let self = this
+                storage.ref('users/' + this.image.name).put(this.image)
+                    .then(response => {
+                        console.log(response)
+                        storage.ref().child('users/' + this.image.name).getDownloadURL().then(function (url) {
+                            firebase.auth().createUserWithEmailAndPassword(self.email, self.password).then(function (user) {
+                                db.collection("users").doc(user.user.uid).set({
+                                    username: self.name,
+                                    image: url
+                                }).then(function (docRef) {
+                                        console.log("Document written with ID: ", docRef);
+                                        self.$router.push('/')
+                                    })
+                                    .catch(function (error) {
+                                        console.error("Error adding document: ", error);
+                                    });
+                            }).catch(function (error) {
+                                var errorCode = error.code;
+                                var errorMessage = error.message;
 
-                    console.log("Code erreur : " + errorCode)
-                    console.log("Message erreur : " + errorMessage)
+                                console.log("Code erreur : " + errorCode)
+                                console.log("Message erreur : " + errorMessage)
 
-                })
+                            })
+
+                        }).catch(function (error) {
+                            console.log(error)
+                        });
+                    })
+                    .catch(err => console.log(err))
+
+
+
                 e.preventDefault()
             }
         }

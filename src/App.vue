@@ -21,6 +21,7 @@ export default {
 
   h1,h2,h3,h4,h5,h6,p,span,li,input,select{
     font-family: 'Montserrat';
+    margin: 0;
   }
   .mapboxgl-ctrl-geocoder{
     svg, .mapboxgl-ctrl-geocoder--pin-right{
