@@ -16,7 +16,7 @@
             <div class="field field-1">
                 <label for="">Type de cuisine</label>
                 <select type="text" v-model="type">
-                    <option value="" v-for="dataType in dataTypes" :key="dataType.id">{{dataType}}</option>
+                    <option :value="dataType" v-for="dataType in dataTypes" :key="dataType.id">{{dataType}}</option>
                 </select>
             </div>
             <div class="field field-1">
@@ -56,7 +56,7 @@
         name: "AddRestaurant",
         data: function () {
             return {
-                dataTypes:['Asiatique','Italien',
+                dataTypes:['Asiatique','Arménien','Italien',
                     'Indien','Mexicain',
                     'Américain','Street food',
                     'Salade','Libanais',
@@ -65,7 +65,8 @@
                     'Pâtisserie','Jus et smoothies',
                 'Africain', 'Grec',
                 'Végétarien','Espagnol',
-                'Tex Mex', 'Canadien','Marocain'],
+                'Tex Mex', 'Canadien',
+                    'Marocain','Burgers'],
                 name: null,
                 image: '',
                 type: null,

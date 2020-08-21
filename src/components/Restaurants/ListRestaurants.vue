@@ -2,6 +2,7 @@
     <div class="list--restaurants">
         <Restaurant v-for="restaurant in restaurants"
                     :key="restaurant.id"
+                    :id="restaurant.id"
                     :name="restaurant.name"
                     :address="restaurant.address"
                     :type="restaurant.type"
@@ -34,6 +35,7 @@
                 db.collection("restaurants")
                     .onSnapshot(function(restaurants) {
                         restaurants.docs.forEach(restaurant =>{
+                            let id = restaurant.id
                             let name = restaurant.get('name')
                             let type = restaurant.get('type')
                             let note = restaurant.get('note')
@@ -41,7 +43,7 @@
                             let image = restaurant.get('image')
                             let address = restaurant.get('address')
 
-                            self.restaurants.push(new RestaurantModel(name,image,address,type,note,price))
+                            self.restaurants.push(new RestaurantModel(id,name,image,address,type,note,price))
                         })
                     });
             }
