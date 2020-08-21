@@ -10,8 +10,6 @@ configFirebase()
 
 export const db = firebase.firestore()
 
-
-
 Vue.use(VueRouter)
 
 const router = new VueRouter({

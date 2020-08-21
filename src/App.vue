@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <Header/>
-
     <router-view></router-view>
   </div>
 </template>
@@ -19,6 +18,35 @@ export default {
 <style lang="scss">
 
   @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+  h1,h2,h3,h4,h5,h6,p,span,li,input,select{
+    font-family: 'Montserrat';
+  }
+  .mapboxgl-ctrl-geocoder{
+    svg, .mapboxgl-ctrl-geocoder--pin-right{
+      display: none;
+    }
+    input{
+      width: 100%;
+      height: 30px;
+      padding: 0;
+
+    }
+    ul,li{
+      padding: 0;
+      list-style: none;
+    }
+
+    li{
+      margin-bottom: 5px;
+      padding: 0 8px 5px 8px;
+      border-bottom: 1px solid #ABABAB;
+      &:hover{
+        cursor: pointer;
+      }
+    }
+  }
+
   .marker{
     background-color: white;
     width: 25px;
@@ -44,6 +72,6 @@ body{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
+  overflow: hidden;
 }
 </style>
