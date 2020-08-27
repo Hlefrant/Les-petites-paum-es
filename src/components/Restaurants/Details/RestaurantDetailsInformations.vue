@@ -1,7 +1,8 @@
 <template>
     <div class="informations">
         <p>Prix : {{ this.price }}</p>
-        <p>Note : {{ this.note }}</p>
+        <p>Note : {{ this.note.value == 0 && this.note.totals == 0 ? 'Pas encore de vote' : this.note.value }} <br>
+        Nb de vote: {{ this.note.totals }}</p>
 
         <div class="address">
             <p>{{ this.address }}</p>
@@ -17,7 +18,7 @@
         name: "RestaurantDetailsInformations",
         props:{
             address: String,
-            note: Number,
+            note: Object,
             price: Number,
             coord: {
                 type: Object,
@@ -58,6 +59,9 @@
 
 <style scoped lang="scss">
     .informations{
+        border: 1px solid #e0e0e0;
+        border-radius: 2px;
+        background: #fff;
         width: 500px;
         .address{
             #map{

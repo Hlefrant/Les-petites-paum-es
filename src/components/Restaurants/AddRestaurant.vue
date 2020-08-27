@@ -127,7 +127,10 @@
                                 type: self.type,
                                 address: self.address,
                                 price: self.price,
-                                note: self.temp_value,
+                                note:{
+                                    value: 0,
+                                    totals: 0
+                                },
                                 coord: self.coord
                             })
                                 .then(function (docRef) {

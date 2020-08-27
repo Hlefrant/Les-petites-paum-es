@@ -12,7 +12,7 @@
 
         <div class="content">
             <RestaurantDetailsInformations v-if="coord.longitude != null" :address="this.address" :note="this.note" :price="this.price" :coord="this.coord" />
-            <RestaurantDetailsComments :id="this.id"/>
+            <RestaurantDetailsComments :id="this.id" :note="this.note"/>
         </div>
     </div>
 </template>
@@ -46,7 +46,7 @@
         methods:{
             getData: function () {
                 let self = this
-                db.collection("restaurants").doc(this.id).get().then(function(restaurant) {
+                db.collection("restaurants").doc(this.id).onSnapshot(function (restaurant) {
                     self.name = restaurant.get('name')
                     self.type = restaurant.get('type')
                     self.note = restaurant.get('note')
@@ -55,10 +55,7 @@
                     self.address = restaurant.get('address')
                     self.coord.longitude = restaurant.get('coord').longitude
                     self.coord.latitude = restaurant.get('coord').latitude
-
-                }).catch(function(error) {
-                    console.log("Error getting document:", error);
-                });
+                })
             }
         }
     }
