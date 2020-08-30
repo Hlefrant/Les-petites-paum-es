@@ -9,7 +9,7 @@
                 <span></span>
                 <span></span>
             </div>
-            <img class="image__user" src="../assets/user.svg" alt="">
+            <img class="image__user" src="" alt="">
             <div v-show="isDisplay && !isAuth" class="dropdown__signs">
                 <router-link to="/login">Connexion</router-link>
                 <router-link to="/signup">Inscription</router-link>
@@ -23,19 +23,34 @@
 
 <script>
     import * as firebase from "firebase";
+    import {db} from "@/main";
 
     export default {
         name: "Header",
         data: function () {
             return{
                 isDisplay: false,
-                isAuth: false
+                isAuth: false,
             }
         },
         mounted() {
-            if(firebase.auth().currentUser !== null){
-                this.isAuth = true
-            }
+            const image = document.querySelector('.image__user')
+            firebase.auth().onAuthStateChanged(async user => {
+                if (user) {
+                   this.isAuth = true
+                    db.collection('users').doc(user.uid).get().then(function(doc) {
+                        if (doc.exists) {
+                        image.src = doc.get('image')
+                        }
+                    }).catch(function(error) {
+                        console.log("Error getting document:", error);
+                    });
+                } else {
+                    console.log(image)
+                    this.isAuth = false
+                    image.src = "/img/user.523c1f5b.svg"
+                }
+            });
         },
         methods:{
             logout: function () {
@@ -81,6 +96,9 @@
             position: relative;
             .image__user{
                 width: 30px;
+                height: 30px;
+                border-radius: 100%;
+                object-fit: cover;
             }
 
             .menu__burger{

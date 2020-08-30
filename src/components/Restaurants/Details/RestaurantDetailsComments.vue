@@ -1,124 +1,143 @@
 <template>
-    <div class="comments">
-        <h2>Commentaires</h2>
-
-        <div class="comments__list">
-            <div class="item" v-for="comment in comments" :key="comment.id">
-                <div class="item__header">
-                    <img :src="comment.authorImage" alt="">
-                    <p>{{ comment.authorName }}</p>
+    <section class="comments__section">
+        <div class="comments">
+            <h2>Commentaires</h2>
+            <div class="comments__list">
+                <div class="item" v-for="comment in comments" :key="comment.id">
+                    <div class="item__header">
+                        <img :src="comment.authorImage" alt="">
+                        <p class="name">{{ comment.authorName }}</p>
+                    </div>
+                    <div class="item__content">
+                        <div class="note">
+                            <div class="stars">
+                                <img src="~@/assets/star.svg" v-for="star in comment.note" :key="star.id"/>
+                            </div>
+                            <p class="date">
+                                {{ comment.date}}
+                            </p>
+                        </div>
+                        <h3>{{ comment.title}}</h3>
+                        <p>{{comment.message}}</p>
+                    </div>
                 </div>
-                <p>{{comment.message + comment.date}}</p>
             </div>
         </div>
-        <form action="" @submit.prevent="addComment">
-            <div class="comment">
-                <label for="">Commentaire</label>
-                <textarea name="" id="" cols="30" rows="10" v-model="message" placeholder="Votre commentaire">
-
-                </textarea>
-            </div>
-            <input type="submit" value="Commenter">
-        </form>
-    </div>
+        <RestaurantFormAddComment :id="this.id" :note="this.note"/>
+    </section>
 </template>
 
 <script>
-    import * as firebase from 'firebase';
-    import { db } from "@/main";
+    import RestaurantFormAddComment from "@/components/Restaurants/Details/RestaurantFormAddComment";
+    import {db} from "@/main";
     import CommentModel from "@/components/Models/CommentModel";
 
     export default {
         name: "RestaurantDetailsComments",
-        data: function(){
-            return{
-                message: null,
-                comments: []
+        components:{
+            RestaurantFormAddComment
+        },
+        data: function () {
+            return {
+                comments: [],
             }
         },
         props: {
-            id: String
+            id: String,
+            note: Object
         },
-        mounted(){
+        mounted() {
             this.getComments()
         },
-        methods:{
-
-            getComments: function(){
+        methods: {
+            getComments: function () {
                 let self = this
-                db.collection('restaurants').doc(this.id).collection('comments').onSnapshot(function(comments) {
+                db.collection('restaurants').doc(this.id).collection('comments').orderBy("timestamp","desc").onSnapshot(function (comments) {
                     self.comments = []
-                    comments.docs.forEach(comment =>{
+                    comments.docs.forEach(comment => {
                         let message = comment.get('message')
+                        let title = comment.get('title')
                         let name = comment.get('author')
+                        let note = comment.get('note')
                         let image = comment.get('image')
                         let date = comment.get('date')
-                        self.comments.push(new CommentModel(name,image,message,date))
+                        self.comments.push(new CommentModel(name, image, title,note, message, date))
                     })
                 });
             },
-            addComment: function (e) {
-                let self = this
-                console.log(firebase.auth().currentUser.uid)
-                db.collection('users').doc(firebase.auth().currentUser.uid).get().then(function(doc) {
-                    if (doc.exists) {
-                        let name = doc.get('username')
-                        let image = doc.get('image')
-
-                        db.collection('restaurants').doc(self.id).collection('comments').add({
-                            message: self.message,
-                            date: self.getCurrentDay(),
-                            author: name,
-                            image: image
-                        })
-                    } else {
-                        // doc.data() will be undefined in this case
-                        console.log("No such document!");
-                    }
-                }).catch(function(error) {
-                    console.log("Error getting document:", error);
-                });
-
-                e.preventDefault()
-            },
-            getCurrentDay: function () {
-                const today = new Date();
-                const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const yyyy = today.getFullYear();
-                let hour    = today.getHours();
-                let minute  = today.getMinutes();
-                let second  = today.getSeconds();
-
-                if(hour.toString().length === 1) {
-                    hour = '0'+hour;
-                }
-                if(minute.toString().length === 1) {
-                    minute = '0'+minute;
-                }
-                if(second.toString().length === 1) {
-                    second = '0'+second;
-                }
-
-                return dd + '/' + mm + '/' + yyyy + '  '+ hour +':' + minute + ':' + second
-            }
         }
     }
 </script>
 
 <style scoped lang="scss">
-.comments{
-    width: 100%;
-    h2{
-        text-align: center;
-    }
-    .comments__list{
-        .item{
-            img{
-                width: 50px;
-                height: 50px;
+    .comments__section{
+        width: 100%;
+        .comments {
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            background: #fff;
+            margin: 12px;
+            h2 {
+                margin-top: 15px;
+                text-align: center;
+            }
+
+            .comments__list {
+                padding: 16px 24px 24px 24px;
+                .item {
+                    display: flex;
+                    margin: 8px 0 4px;
+                    border-top: 1px solid #e0e0e0;
+                    padding: 8px 0;
+                    .item__header{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        margin-right: 15px;
+                        img {
+                            width: 72px;
+                            height: 72px;
+                            object-fit: fill;
+                            border-radius: 100%;
+                            margin-bottom: 10px;
+                        }
+                        .name{
+                            text-transform: uppercase;
+                            font-size: 11px;
+                        }
+                    }
+                    .item__content{
+
+                        .note{
+                            display: flex;
+                            align-items: center;
+                            .stars{
+                                img{
+                                    width: 15px;
+                                    margin-right: 3px;
+                                }
+                            }
+                            .date{
+                                margin-left: 8px;
+                                color: #474747;
+                                font-size: 12px;
+                            }
+                        }
+                        h3{
+                            font-size: 20px;
+                            color: black;
+                            margin-top: 8px;
+                            margin-bottom: 8px;
+                        }
+                        p{
+                            font-size: 14px;
+                            line-height: 20px;
+                            color: #474747;
+                        }
+                    }
+                }
             }
         }
     }
-}
+
 </style>

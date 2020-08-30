@@ -11,7 +11,7 @@
             </div>
 
             <div class="stars">
-                <img class="star-rating__star" src="~@/assets/star.svg" v-for="star in note" :key="star.id"/>
+                <img class="star-rating__star" src="~@/assets/star.svg" v-for="star in Math.round(note.value)" :key="star.id"/>
             </div>
         </div>
 
@@ -28,7 +28,7 @@
             name: String,
             address: String,
             type: String,
-            note: Number,
+            note: Object,
             price: Number,
             image: String
         },
