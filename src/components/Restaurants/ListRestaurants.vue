@@ -29,6 +29,12 @@
         created() {
             this.getRestaurants()
         },
+        computed:{
+            filterRestaurants: function () {
+
+                return 'ff'
+            }
+        },
         methods:{
             getRestaurants: function () {
                 let self = this

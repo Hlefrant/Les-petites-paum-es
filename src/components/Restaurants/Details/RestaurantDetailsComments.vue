@@ -1,54 +1,45 @@
 <template>
-    <div class="comments">
-        <h2>Commentaires</h2>
-
-        <div class="comments__list">
-            <div class="item" v-for="comment in comments" :key="comment.id">
-                <div class="item__header">
-                    <img :src="comment.authorImage" alt="">
-                    <p>{{ comment.authorName }}</p>
+    <section class="comments__section">
+        <div class="comments">
+            <h2>Commentaires</h2>
+            <div class="comments__list">
+                <div class="item" v-for="comment in comments" :key="comment.id">
+                    <div class="item__header">
+                        <img :src="comment.authorImage" alt="">
+                        <p class="name">{{ comment.authorName }}</p>
+                    </div>
+                    <div class="item__content">
+                        <div class="note">
+                            <div class="stars">
+                                <img src="~@/assets/star.svg" v-for="star in comment.note" :key="star.id"/>
+                            </div>
+                            <p class="date">
+                                {{ comment.date}}
+                            </p>
+                        </div>
+                        <h3>{{ comment.title}}</h3>
+                        <p>{{comment.message}}</p>
+                    </div>
                 </div>
-                <p>{{comment.message + comment.date}}</p>
             </div>
         </div>
-        <form action="" @submit.prevent="addComment">
-            <div class="star-rating field field-1">
-                <label for="">Note</label>
-                <label class="star-rating__star" :key="rating" v-for="rating in ratings"
-                       :class="{'is-selected': ((value >= rating) && value != null), 'is-disabled': disabled}"
-                       v-on:click="set(rating)" v-on:mouseover="star_over(rating)" v-on:mouseout="star_out">
-                    <input class="star-rating star-rating__checkbox" type="radio" :value="rating" :name="name"
-                           v-model="value" :disabled="disabled">★</label>
-            </div>
-            <div class="title">
-                <label for="">Titre du commentaire</label>
-                <input type="text" v-model="title">
-            </div>
-            <div class="comment">
-                <label for="">Commentaire</label>
-                <textarea name="" id="" cols="30" rows="10" v-model="message" placeholder="Votre commentaire">
-                </textarea>
-            </div>
-            <input type="submit" value="Commenter">
-        </form>
-    </div>
+        <RestaurantFormAddComment :id="this.id" :note="this.note"/>
+    </section>
 </template>
 
 <script>
-    import * as firebase from 'firebase';
+    import RestaurantFormAddComment from "@/components/Restaurants/Details/RestaurantFormAddComment";
     import {db} from "@/main";
     import CommentModel from "@/components/Models/CommentModel";
 
     export default {
         name: "RestaurantDetailsComments",
+        components:{
+            RestaurantFormAddComment
+        },
         data: function () {
             return {
-                title: null,
-                message: null,
                 comments: [],
-                value: null,
-                temp_value: null,
-                ratings: [1, 2, 3, 4, 5]
             }
         },
         props: {
@@ -59,150 +50,94 @@
             this.getComments()
         },
         methods: {
-            processFile(event) {
-                this.image = event.target.files[0]
-            },
-            star_over: function (index) {
-                this.temp_value = this.value;
-                return this.value = index;
-            },
-            star_out: function () {
-                return this.value = this.temp_value;
-            },
-            set: function (value) {
-                this.temp_value = value;
-                return this.value = value;
-            },
             getComments: function () {
                 let self = this
-                db.collection('restaurants').doc(this.id).collection('comments').onSnapshot(function (comments) {
+                db.collection('restaurants').doc(this.id).collection('comments').orderBy("timestamp","desc").onSnapshot(function (comments) {
                     self.comments = []
                     comments.docs.forEach(comment => {
                         let message = comment.get('message')
                         let title = comment.get('title')
                         let name = comment.get('author')
+                        let note = comment.get('note')
                         let image = comment.get('image')
                         let date = comment.get('date')
-                        self.comments.push(new CommentModel(name, image, title, message, date))
+                        self.comments.push(new CommentModel(name, image, title,note, message, date))
                     })
                 });
             },
-            addComment: function (e) {
-                let self = this
-                console.log(firebase.auth().currentUser.uid)
-                db.collection('users').doc(firebase.auth().currentUser.uid).get().then(function (doc) {
-                    if (doc.exists) {
-                        let name = doc.get('username')
-                        let image = doc.get('image')
-                        let divide = self.note.value === 0 ? 1 : 2
-                        db.collection('restaurants').doc(self.id).update({
-                            note: {
-                                value: (self.temp_value + self.note.value) / divide,
-                                totals: self.note.totals + 1
-                            }
-                        }).then(function () {
-                            console.log("Document successfully updated!");
-                        }).catch(function (error) {
-                                // The document probably doesn't exist.
-                                console.error("Error updating document: ", error);
-                            });
-
-                        db.collection('restaurants').doc(self.id).collection('comments').add({
-                            title: self.title,
-                            message: self.message,
-                            date: self.getCurrentDay(),
-                            author: name,
-                            image: image
-                        })
-                    } else {
-                        // doc.data() will be undefined in this case
-                        console.log("No such document!");
-                    }
-                }).catch(function (error) {
-                    console.log("Error getting document:", error);
-                });
-
-                e.preventDefault()
-            },
-            getCurrentDay: function () {
-                const today = new Date();
-                const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const yyyy = today.getFullYear();
-                let hour = today.getHours();
-                let minute = today.getMinutes();
-                let second = today.getSeconds();
-
-                if (hour.toString().length === 1) {
-                    hour = '0' + hour;
-                }
-                if (minute.toString().length === 1) {
-                    minute = '0' + minute;
-                }
-                if (second.toString().length === 1) {
-                    second = '0' + second;
-                }
-
-                return dd + '/' + mm + '/' + yyyy + '  ' + hour + ':' + minute + ':' + second
-            }
         }
     }
 </script>
 
 <style scoped lang="scss">
-    .comments {
+    .comments__section{
         width: 100%;
-
-        h2 {
-            text-align: center;
-        }
-
-        .comments__list {
-            .item {
-                img {
-                    width: 50px;
-                    height: 50px;
-                }
-            }
-        }
-
-        %visually-hidden {
-            position: absolute;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
-            height: 1px;
-            width: 1px;
-            margin: -1px;
-            padding: 0;
-            border: 0;
-        }
-
-        .star-rating {
-            &__star {
-                display: inline-block !important;
-                padding: 3px;
-                vertical-align: middle;
-                line-height: 1;
-                font-size: 1.5em;
-                color: #ABABAB;
-                transition: color .2s ease-out;
-
-                &:hover {
-                    cursor: pointer;
-                }
-
-                &.is-selected {
-                    color: #FFD700;
-                }
-
-                &.is-disabled:hover {
-                    cursor: default;
-                }
+        .comments {
+            border: 1px solid #e0e0e0;
+            border-radius: 2px;
+            background: #fff;
+            margin: 12px;
+            h2 {
+                margin-top: 15px;
+                text-align: center;
             }
 
-            &__checkbox {
-                @extend %visually-hidden;
+            .comments__list {
+                padding: 16px 24px 24px 24px;
+                .item {
+                    display: flex;
+                    margin: 8px 0 4px;
+                    border-top: 1px solid #e0e0e0;
+                    padding: 8px 0;
+                    .item__header{
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        margin-right: 15px;
+                        img {
+                            width: 72px;
+                            height: 72px;
+                            object-fit: fill;
+                            border-radius: 100%;
+                            margin-bottom: 10px;
+                        }
+                        .name{
+                            text-transform: uppercase;
+                            font-size: 11px;
+                        }
+                    }
+                    .item__content{
+
+                        .note{
+                            display: flex;
+                            align-items: center;
+                            .stars{
+                                img{
+                                    width: 15px;
+                                    margin-right: 3px;
+                                }
+                            }
+                            .date{
+                                margin-left: 8px;
+                                color: #474747;
+                                font-size: 12px;
+                            }
+                        }
+                        h3{
+                            font-size: 20px;
+                            color: black;
+                            margin-top: 8px;
+                            margin-bottom: 8px;
+                        }
+                        p{
+                            font-size: 14px;
+                            line-height: 20px;
+                            color: #474747;
+                        }
+                    }
+                }
             }
         }
     }
+
 </style>

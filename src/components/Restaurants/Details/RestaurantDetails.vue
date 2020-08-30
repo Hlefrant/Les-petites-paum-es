@@ -108,6 +108,7 @@
     }
     .content{
         display: flex;
+        align-items: flex-start;
     }
 }
 </style>

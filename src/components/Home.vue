@@ -1,9 +1,9 @@
 <template>
     <div>
-        <router-link class="add" to="/add">
+        <div class="add" @click="this.checkIsAuth">
             Ajouter restaurants
             <img src="../assets/food.svg" alt="">
-        </router-link>
+        </div>
 
         <div class="container">
             <ListRestaurants/>
@@ -14,12 +14,22 @@
 
 <script>
     import ListRestaurants from "@/components/Restaurants/ListRestaurants";
+    import * as firebase from 'firebase/app';
     import Map from "@/components/Map/Map";
     export default {
         name: "Home",
         components:{
             ListRestaurants,
             Map
+        },
+        methods:{
+            checkIsAuth: function () {
+                if (firebase.auth().currentUser === null){
+                    this.$router.push('/login')
+                }else{
+                    this.$router.push('/add')
+                }
+            }
         }
     }
 </script>
